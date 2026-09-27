@@ -1,13 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { getTasks } from './src/services/taskService';
-import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let ignore = false;
@@ -38,34 +39,40 @@ export default function App() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [retryCount]);
 
   async function handleRefresh() {
-  if (refreshing) {
-    return;
-  }
+    if (refreshing) {
+      return;
+    }
 
-  setRefreshing(true);
+    setRefreshing(true);
 
-  try {
-    const data = await getTasks();
-    setTasks(data);
-  } catch {
-    Alert.alert(
-      'Kunde inte uppdatera',
-      'Kontrollera anslutningen och att backend körs. Den tidigare listan visas fortfarande.'
-    );
-  } finally {
-    setRefreshing(false);
+    try {
+      const data = await getTasks();
+      setTasks(data);
+    } catch {
+      Alert.alert(
+        'Kunde inte uppdatera',
+        'Kontrollera anslutningen och att backend körs. Den tidigare listan visas fortfarande.'
+      );
+    } finally {
+      setRefreshing(false);
+    }
   }
-}
 
   return (
     <View style={styles.container}>
       {loading ? (
         <Text>Hämtar uppgifter...</Text>
       ) : error ? (
-        <Text accessibilityRole="alert">{error}</Text>
+        <View>
+          <Text accessibilityRole="alert">{error}</Text>
+          <Button
+            title="Försök igen"
+            onPress={() => setRetryCount((count) => count + 1)}
+          />
+        </View>
       ) : (
         <FlatList
           refreshing={refreshing}

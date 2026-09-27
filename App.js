@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { getTasks } from './src/services/taskService';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -39,6 +40,26 @@ export default function App() {
     };
   }, []);
 
+  async function handleRefresh() {
+  if (refreshing) {
+    return;
+  }
+
+  setRefreshing(true);
+
+  try {
+    const data = await getTasks();
+    setTasks(data);
+  } catch {
+    Alert.alert(
+      'Kunde inte uppdatera',
+      'Kontrollera anslutningen och att backend körs. Den tidigare listan visas fortfarande.'
+    );
+  } finally {
+    setRefreshing(false);
+  }
+}
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -47,6 +68,8 @@ export default function App() {
         <Text accessibilityRole="alert">{error}</Text>
       ) : (
         <FlatList
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           style={styles.list}
           contentContainerStyle={styles.listContent}
           data={tasks}

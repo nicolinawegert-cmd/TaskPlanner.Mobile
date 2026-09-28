@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import SelectStatus from './SelectStatus';
+import DueDatePicker from './DueDatePicker';
+import { formatDateForApi, parseDateFromApi } from '../../utils/dateUtils';
 
 export default function TaskEditForm({ task, onSubmit, onCancel }) {
   const [title, setTitle] = useState(task.title);
@@ -8,6 +10,7 @@ export default function TaskEditForm({ task, onSubmit, onCancel }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState(task.status);
+  const [dueDate, setDueDate] = useState(parseDateFromApi(task.dueDate));
 
   async function handleSubmit() {
     if (saving) {
@@ -27,7 +30,7 @@ try {
     title: title.trim(),
     description: description.trim(),
     status: status,
-    dueDate: task.dueDate,
+    dueDate: formatDateForApi(dueDate),
   });
 } catch (err) {
   setError(err.message || 'Could not update the task.');
@@ -62,6 +65,8 @@ try {
       />
 
       <SelectStatus value={status} onChange={setStatus} disabled={saving} />
+      
+      <DueDatePicker value={dueDate} onChange={setDueDate} disabled={saving} />
 
       {error ? (
         <Text style={styles.error} accessibilityRole="alert">

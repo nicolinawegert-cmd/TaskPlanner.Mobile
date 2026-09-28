@@ -3,11 +3,7 @@ import { useEffect, useState } from 'react';
 import { getTasks, createTask, updateTask, deleteTask, uploadTaskFile } from './src/services/taskService';
 import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
 import TaskForm from './src/components/TaskForm/TaskForm';
-import TaskEditForm from './src/components/TaskForm/TaskEditForm';
-import TaskAttachment from './src/components/TaskAttachment/TaskAttachment';
-import FileUpload from './src/components/FileUpload/FileUpload';
-import StatusBadge from './src/components/StatusBadge/StatusBadge';
-import AppButton from './src/components/ui/AppButton';
+import TaskItem from './src/components/TaskItem/TaskItem';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -172,75 +168,23 @@ export default function App() {
           keyboardDismissMode="on-drag"
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={styles.taskItem}>
-              {editingTaskId === item.id ? (
-                <TaskEditForm
-                  task={item}
-                  onSubmit={handleUpdateTask}
-                  onCancel={() => setEditingTaskId(null)}
-                />
-              ) : (
-                <>
-                  <Text style={styles.taskTitle}>{item.title}</Text>
-                  <Text>{item.description}</Text>
-                  <View style={styles.statusContainer}>
-                    <StatusBadge status={item.status} />
-                  </View>
-                  <Text>
-                    Due date:{' '}
-                    {item.dueDate ? item.dueDate.split('T')[0] : 'No due date'}
-                  </Text>
-
-                  <View style={styles.attachmentSection}>
-                    <Text style={styles.sectionTitle}>Attachment</Text>
-                    {item.fileName ? (
-                      <TaskAttachment fileName={item.fileName} />
-                    ) : (
-                      <Text style={styles.sectionHint}>No attachment yet.</Text>
-                    )}
-                    <FileUpload
-                      onUpload={(file) => handleFileUpload(item.id, file)}
-                      uploading={uploadingTaskId === item.id}
-                      disabled={
-                        editingTaskId !== null ||
-                        deletingTaskId !== null ||
-                        uploadingTaskId !== null ||
-                        refreshing
-                      }
-                    />
-                  </View>
-
-                  <View style={styles.taskActions}>
-                    <View style={styles.actionButton}>
-                      <AppButton
-                        title="Edit"
-                        variant="secondary"
-                        onPress={() => setEditingTaskId(item.id)}
-                        disabled={
-                          editingTaskId !== null ||
-                          deletingTaskId !== null ||
-                          uploadingTaskId !== null ||
-                          refreshing
-                        }
-                      />
-                    </View>
-                    <View style={styles.actionButton}>
-                      <AppButton
-                        title={deletingTaskId === item.id ? 'Deleting...' : 'Delete'}
-                        variant="danger"
-                        onPress={() => confirmDeleteTask(item)}
-                        disabled={
-                          editingTaskId !== null ||
-                          deletingTaskId !== null ||
-                          uploadingTaskId !== null ||
-                          refreshing
-                        }
-                      />
-                    </View>
-                  </View>
-                </>
-              )}
-            </View>
+            <TaskItem
+              task={item}
+              isEditing={editingTaskId === item.id}
+              isDeleting={deletingTaskId === item.id}
+              isUploading={uploadingTaskId === item.id}
+              disabled={
+                editingTaskId !== null ||
+                deletingTaskId !== null ||
+                uploadingTaskId !== null ||
+                refreshing
+              }
+              onEdit={() => setEditingTaskId(item.id)}
+              onCancel={() => setEditingTaskId(null)}
+              onUpdate={handleUpdateTask}
+              onDelete={() => confirmDeleteTask(item)}
+              onUpload={(file) => handleFileUpload(item.id, file)}
+            />
           )}
           ListEmptyComponent={<Text>No tasks yet.</Text>}
         />
@@ -265,39 +209,4 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 20,
   },
-  taskItem: {
-    padding: 16,
-    marginBottom: 12,
-    backgroundColor: '#f3f3f3',
-    borderRadius: 8,
-  },
-  taskTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 6,
-  },
-  statusContainer: {
-    marginVertical: 8,
-  },
-  attachmentSection: {
-    marginTop: 16,
-    padding: 12,
-    gap: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D0D5DD',
-    borderRadius: 10,
-  },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: '#101828' },
-  sectionHint: { fontSize: 14, color: '#475467' },
-  taskActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#D0D5DD',
-  },
-  actionButton: { flexGrow: 1, flexBasis: 110, maxWidth: '100%' },
 });

@@ -15,7 +15,7 @@ export default function TaskEditForm({ task, onSubmit, onCancel }) {
     }
 
     if (!title.trim()) {
-      setError('Skriv en titel för uppgiften.');
+      setError('Please enter a task title.');
       return;
     }
 
@@ -30,7 +30,7 @@ try {
     dueDate: task.dueDate,
   });
 } catch (err) {
-  setError(err.message || 'Kunde inte uppdatera uppgiften.');
+  setError(err.message || 'Could not update the task.');
 } finally {
   setSaving(false);
 }
@@ -38,27 +38,27 @@ try {
 
   return (
     <View style={styles.form}>
-      <Text style={styles.heading}>Redigera uppgift</Text>
+      <Text style={styles.heading}>Edit task</Text>
 
-      <Text>Titel</Text>
+      <Text>Title</Text>
       <TextInput
         style={styles.input}
-        accessibilityLabel="Titel"
+        accessibilityLabel="Title"
         value={title}
         onChangeText={setTitle}
         editable={!saving}
-        placeholder="Vad behöver du göra?"
+        placeholder="What do you need to do?"
       />
 
-      <Text>Beskrivning</Text>
+      <Text>Description</Text>
       <TextInput
         style={[styles.input, styles.description]}
-        accessibilityLabel="Beskrivning"
+        accessibilityLabel="Description"
         value={description}
         onChangeText={setDescription}
         editable={!saving}
         multiline
-        placeholder="Lägg till en beskrivning"
+        placeholder="Add a description"
       />
 
       <SelectStatus value={status} onChange={setStatus} disabled={saving} />
@@ -70,12 +70,12 @@ try {
       ) : null}
 
       <Button
-        title={saving ? 'Sparar...' : 'Spara ändringar'}
+        title={saving ? 'Saving...' : 'Save'}
         onPress={handleSubmit}
         disabled={saving}
       />
 
-      <Button title="Avbryt" onPress={onCancel} disabled={saving} />
+      <Button title="Cancel" onPress={onCancel} disabled={saving} />
     </View>
   );
 }

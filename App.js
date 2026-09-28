@@ -29,7 +29,7 @@ export default function App() {
         }
       } catch (err) {
         if (!ignore) {
-          setError(err.message || 'Något gick fel vid hämtningen.');
+          setError(err.message || 'Could not load tasks.');
         }
       } finally {
         if (!ignore) {
@@ -57,8 +57,8 @@ export default function App() {
       setTasks(data);
     } catch {
       Alert.alert(
-        'Kunde inte uppdatera',
-        'Kontrollera anslutningen och att backend körs. Den tidigare listan visas fortfarande.'
+        'Could not refresh tasks',
+        'Check your connection and make sure the backend is running. The previous list is still displayed.'
       );
     } finally {
       setRefreshing(false);
@@ -96,8 +96,8 @@ export default function App() {
       setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
     } catch (err) {
       Alert.alert(
-        'Kunde inte ta bort uppgiften',
-        err.message || 'Försök igen senare.'
+        'Could not delete the task',
+        err.message || 'Please try again later.'
       );
     } finally {
       setDeletingTaskId(null);
@@ -106,15 +106,15 @@ export default function App() {
 
   function confirmDeleteTask(task) {
     Alert.alert(
-      'Ta bort uppgift?',
-      `Vill du ta bort "${task.title}"? Det går inte att ångra.`,
+      'Delete task?',
+      `Delete "${task.title}"? This cannot be undone.`,
       [
         {
-          text: 'Avbryt',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Ta bort',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => handleDeleteTask(task.id),
         },
@@ -125,12 +125,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Hämtar uppgifter...</Text>
+        <Text>Loading tasks...</Text>
       ) : error ? (
         <View>
           <Text accessibilityRole="alert">{error}</Text>
           <Button
-            title="Försök igen"
+            title="Try again"
             onPress={() => setRetryCount((count) => count + 1)}
           />
         </View>
@@ -165,7 +165,7 @@ export default function App() {
                   <Text>Status: {item.status}</Text>
 
                   <Button
-                    title="Redigera"
+                    title="Edit"
                     onPress={() => setEditingTaskId(item.id)}
                     disabled={
                       editingTaskId !== null ||
@@ -174,7 +174,7 @@ export default function App() {
                     }
                   />
                   <Button
-                    title="Ta bort"
+                    title="Delete"
                     onPress={() => confirmDeleteTask(item)}
                     disabled={deletingTaskId !== null || refreshing}
                   />
@@ -182,7 +182,7 @@ export default function App() {
               )}
             </View>
           )}
-          ListEmptyComponent={<Text>Det finns inga uppgifter ännu.</Text>}
+          ListEmptyComponent={<Text>No tasks yet.</Text>}
         />
       )}
       <StatusBar style="auto" />

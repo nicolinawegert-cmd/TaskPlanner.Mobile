@@ -15,7 +15,7 @@ export default function TaskForm({ onSubmit }) {
     }
 
     if (!title.trim()) {
-      setError('Skriv en titel för uppgiften.');
+      setError('Please enter a task title.');
       return;
     }
 
@@ -34,7 +34,7 @@ export default function TaskForm({ onSubmit }) {
       setDescription('');
       setStatus('NotStarted');
     } catch (err) {
-      setError(err.message || 'Kunde inte skapa uppgiften.');
+      setError(err.message || 'Could not create the task.');
     } finally {
       setSaving(false);
     }
@@ -42,27 +42,27 @@ export default function TaskForm({ onSubmit }) {
 
   return (
     <View style={styles.form}>
-      <Text style={styles.heading}>Ny uppgift</Text>
+      <Text style={styles.heading}>Add task</Text>
 
-      <Text>Titel</Text>
+      <Text>Title</Text>
       <TextInput
         style={styles.input}
-        accessibilityLabel="Titel"
+        accessibilityLabel="Title"
         value={title}
         onChangeText={setTitle}
         editable={!saving}
-        placeholder="Vad behöver du göra?"
+        placeholder="What do you need to do?"
       />
 
-      <Text>Beskrivning</Text>
+      <Text>Description</Text>
       <TextInput
         style={[styles.input, styles.description]}
-        accessibilityLabel="Beskrivning"
+        accessibilityLabel="Description"
         value={description}
         onChangeText={setDescription}
         editable={!saving}
         multiline
-        placeholder="Lägg till en beskrivning"
+        placeholder="Add a description"
       />
 
       <SelectStatus value={status} onChange={setStatus} disabled={saving} />
@@ -74,7 +74,7 @@ export default function TaskForm({ onSubmit }) {
       ) : null}
 
       <Button
-        title={saving ? 'Sparar...' : 'Lägg till uppgift'}
+        title={saving ? 'Saving...' : 'Add task'}
         onPress={handleSubmit}
         disabled={saving}
       />

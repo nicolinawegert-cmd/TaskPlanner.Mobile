@@ -1,5 +1,6 @@
-import { Alert, Button, Linking, Text, View } from 'react-native';
+import { Alert, Linking, Text, View } from 'react-native';
 import { getTaskFileUrl } from '../../services/taskService';
+import AppButton from '../ui/AppButton';
 
 export default function TaskAttachment({ fileName }) {
   if (!fileName) {
@@ -17,8 +18,8 @@ export default function TaskAttachment({ fileName }) {
 
   return (
     <View style={{ gap: 8 }}>
-      <Text>Attachment: {fileName}</Text>
-      <Button title="Open attachment" onPress={handleOpenFile} />
+      <Text style={{ color: '#344054', fontSize: 14 }}>{fileName}</Text>
+      <AppButton title="Open attachment" variant="link" onPress={handleOpenFile} />
     </View>
   );
 }

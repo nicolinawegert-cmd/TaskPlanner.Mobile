@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
+import AppButton from '../ui/AppButton';
 
 export default function FileUpload({
   onUpload,
@@ -54,8 +55,9 @@ export default function FileUpload({
 
   return (
     <View style={{ gap: 8 }}>
-      <Button
+      <AppButton
         title={picking ? 'Opening...' : 'Choose file'}
+        variant="link"
         onPress={handleSelectFile}
         disabled={disabled || picking || uploading}
       />
@@ -64,14 +66,16 @@ export default function FileUpload({
         <>
           <Text>Selected file: {selectedFile.name}</Text>
 
-          <Button
+          <AppButton
             title={uploading ? 'Uploading...' : 'Upload'}
+            variant="primary"
             onPress={handleUpload}
             disabled={disabled || picking || uploading}
           />
 
-          <Button
+          <AppButton
             title="Clear selection"
+            variant="secondary"
             onPress={() => setSelectedFile(null)}
             disabled={disabled || picking || uploading}
           />

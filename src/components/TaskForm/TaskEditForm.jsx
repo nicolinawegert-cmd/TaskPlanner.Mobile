@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-
-const statusOptions = [
-  { value: 'NotStarted', label: 'Inte påbörjad' },
-  { value: 'InProgress', label: 'Pågående' },
-  { value: 'Completed', label: 'Klar' },
-];
+import SelectStatus from './SelectStatus';
 
 export default function TaskEditForm({ task, onSubmit, onCancel }) {
   const [title, setTitle] = useState(task.title);
@@ -66,18 +61,7 @@ try {
         placeholder="Lägg till en beskrivning"
       />
 
-      <Text>Status</Text>
-
-      {statusOptions.map((option) => (
-        <Button
-          key={option.value}
-          title={
-            status === option.value ? `${option.label} (vald)` : option.label
-          }
-          onPress={() => setStatus(option.value)}
-          disabled={saving}
-        />
-      ))}
+      <SelectStatus value={status} onChange={setStatus} disabled={saving} />
 
       {error ? (
         <Text style={styles.error} accessibilityRole="alert">

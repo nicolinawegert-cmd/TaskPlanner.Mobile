@@ -163,6 +163,10 @@ export default function App() {
                   <Text style={styles.taskTitle}>{item.title}</Text>
                   <Text>{item.description}</Text>
                   <Text>Status: {item.status}</Text>
+                  <Text>
+                    Due date:{' '}
+                    {item.dueDate ? item.dueDate.split('T')[0] : 'No due date'}
+                  </Text>
 
                   <Button
                     title="Edit"

@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import SelectStatus from './SelectStatus';  
+import DueDatePicker from './DueDatePicker';
+
+function formatDateForApi(date) {
+  if (date === null) {
+    return null;
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T00:00:00`;
+}
 
 export default function TaskForm({ onSubmit }) {
   const [title, setTitle] = useState('');
@@ -8,6 +21,7 @@ export default function TaskForm({ onSubmit }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('NotStarted');
+  const [dueDate, setDueDate] = useState(null);
 
   async function handleSubmit() {
     if (saving) {
@@ -27,12 +41,13 @@ export default function TaskForm({ onSubmit }) {
         title: title.trim(),
         description: description.trim(),
         status: status,
-        dueDate: null,
+        dueDate: formatDateForApi(dueDate),
       });
 
       setTitle('');
       setDescription('');
       setStatus('NotStarted');
+      setDueDate(null);
     } catch (err) {
       setError(err.message || 'Could not create the task.');
     } finally {
@@ -66,6 +81,8 @@ export default function TaskForm({ onSubmit }) {
       />
 
       <SelectStatus value={status} onChange={setStatus} disabled={saving} />
+
+      <DueDatePicker value={dueDate} onChange={setDueDate} disabled={saving} />
 
       {error ? (
         <Text style={styles.error} accessibilityRole="alert">

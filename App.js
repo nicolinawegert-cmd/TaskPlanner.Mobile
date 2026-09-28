@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { getTasks } from './src/services/taskService';
+import { getTasks, createTask } from './src/services/taskService';
 import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
+import TaskForm from './src/components/TaskForm/TaskForm';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -61,6 +62,12 @@ export default function App() {
     }
   }
 
+  async function handleCreateTask(task) {
+    const createdTask = await createTask(task);
+
+    setTasks((currentTasks) => [createdTask, ...currentTasks]);
+  }
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -80,6 +87,9 @@ export default function App() {
           style={styles.list}
           contentContainerStyle={styles.listContent}
           data={tasks}
+          ListHeaderComponent={<TaskForm onSubmit={handleCreateTask} />}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.taskItem}>

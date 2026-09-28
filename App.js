@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { getTasks, createTask, updateTask } from './src/services/taskService';
+import { getTasks, createTask, updateTask, deleteTask } from './src/services/taskService';
 import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
 import TaskForm from './src/components/TaskForm/TaskForm';
 import TaskEditForm from './src/components/TaskForm/TaskEditForm';
@@ -12,6 +12,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [deletingTaskId, setDeletingTaskId] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -82,6 +83,45 @@ export default function App() {
     setEditingTaskId(null);
   }
 
+  async function handleDeleteTask(id) {
+    if (deletingTaskId !== null) {
+      return;
+    }
+
+    setDeletingTaskId(id);
+
+    try {
+      await deleteTask(id);
+
+      setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
+    } catch (err) {
+      Alert.alert(
+        'Kunde inte ta bort uppgiften',
+        err.message || 'Försök igen senare.'
+      );
+    } finally {
+      setDeletingTaskId(null);
+    }
+  }
+
+  function confirmDeleteTask(task) {
+    Alert.alert(
+      'Ta bort uppgift?',
+      `Vill du ta bort "${task.title}"? Det går inte att ångra.`,
+      [
+        {
+          text: 'Avbryt',
+          style: 'cancel',
+        },
+        {
+          text: 'Ta bort',
+          style: 'destructive',
+          onPress: () => handleDeleteTask(task.id),
+        },
+      ]
+    );
+  }
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -97,11 +137,15 @@ export default function App() {
       ) : (
         <FlatList
           refreshing={refreshing}
-          onRefresh={editingTaskId === null ? handleRefresh : undefined}
+          onRefresh={
+            editingTaskId === null && deletingTaskId === null
+              ? handleRefresh
+              : undefined
+          }
+          extraData={{ editingTaskId, deletingTaskId }}
           style={styles.list}
           contentContainerStyle={styles.listContent}
           data={tasks}
-          extraData={editingTaskId}
           ListHeaderComponent={<TaskForm onSubmit={handleCreateTask} />}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
@@ -123,7 +167,16 @@ export default function App() {
                   <Button
                     title="Redigera"
                     onPress={() => setEditingTaskId(item.id)}
-                    disabled={editingTaskId !== null || refreshing}
+                    disabled={
+                      editingTaskId !== null ||
+                      deletingTaskId !== null ||
+                      refreshing
+                    }
+                  />
+                  <Button
+                    title="Ta bort"
+                    onPress={() => confirmDeleteTask(item)}
+                    disabled={deletingTaskId !== null || refreshing}
                   />
                 </>
               )}

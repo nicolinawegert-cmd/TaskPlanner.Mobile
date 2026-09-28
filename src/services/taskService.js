@@ -59,3 +59,19 @@ export async function updateTask(id, task) {
 
   return response.json();
 }
+
+export async function deleteTask(id) {
+  if (!API_URL) {
+    throw new Error(
+      'API-adressen saknas. Ange EXPO_PUBLIC_API_URL i .env.local och ladda om appen.'
+    );
+  }
+
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Kunde inte ta bort uppgiften.');
+  }
+}

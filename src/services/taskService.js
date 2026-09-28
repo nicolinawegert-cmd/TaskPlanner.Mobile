@@ -1,3 +1,6 @@
+import { File } from 'expo-file-system';
+import { fetch as expoFetch } from 'expo/fetch';
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function getTasks() {
@@ -87,4 +90,28 @@ export function getTaskFileUrl(fileName) {
     `/uploads/${encodeURIComponent(fileName)}`,
     API_URL
   ).toString();
+}
+
+export async function uploadTaskFile(id, file) {
+  if (!API_URL) {
+    throw new Error(
+      'API URL is missing. Set EXPO_PUBLIC_API_URL in .env.local and reload the app.'
+    );
+  }
+
+  const uploadFile = new File(file.uri);
+  const formData = new FormData();
+
+  formData.append('file', uploadFile);
+
+  const response = await expoFetch(`${API_URL}/${id}/file`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Could not upload the file. Please try again.');
+  }
+
+  return response.json();
 }

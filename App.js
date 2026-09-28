@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { getTasks, createTask, updateTask, deleteTask } from './src/services/taskService';
+import { getTasks, createTask, updateTask, deleteTask, uploadTaskFile } from './src/services/taskService';
 import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
 import TaskForm from './src/components/TaskForm/TaskForm';
 import TaskEditForm from './src/components/TaskForm/TaskEditForm';
 import TaskAttachment from './src/components/TaskAttachment/TaskAttachment';
+import FileUpload from './src/components/FileUpload/FileUpload';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -14,6 +15,7 @@ export default function App() {
   const [retryCount, setRetryCount] = useState(0);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [deletingTaskId, setDeletingTaskId] = useState(null);
+  const [uploadingTaskId, setUploadingTaskId] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -84,6 +86,20 @@ export default function App() {
     setEditingTaskId(null);
   }
 
+  async function handleFileUpload(id, file) {
+    setUploadingTaskId(id);
+
+    try {
+      const updatedTask = await uploadTaskFile(id, file);
+
+      setTasks((currentTasks) =>
+        currentTasks.map((task) => (task.id === id ? updatedTask : task))
+      );
+    } finally {
+      setUploadingTaskId(null);
+    }
+  }
+
   async function handleDeleteTask(id) {
     if (deletingTaskId !== null) {
       return;
@@ -139,11 +155,13 @@ export default function App() {
         <FlatList
           refreshing={refreshing}
           onRefresh={
-            editingTaskId === null && deletingTaskId === null
+            editingTaskId === null &&
+            deletingTaskId === null &&
+            uploadingTaskId === null
               ? handleRefresh
               : undefined
           }
-          extraData={{ editingTaskId, deletingTaskId }}
+          extraData={{ editingTaskId, deletingTaskId, uploadingTaskId }}
           style={styles.list}
           contentContainerStyle={styles.listContent}
           data={tasks}
@@ -171,19 +189,36 @@ export default function App() {
 
                   <TaskAttachment fileName={item.fileName} />
 
+                  <FileUpload
+                    onUpload={(file) => handleFileUpload(item.id, file)}
+                    uploading={uploadingTaskId === item.id}
+                    disabled={
+                      editingTaskId !== null ||
+                      deletingTaskId !== null ||
+                      uploadingTaskId !== null ||
+                      refreshing
+                    }
+                  />
+
                   <Button
                     title="Edit"
                     onPress={() => setEditingTaskId(item.id)}
                     disabled={
                       editingTaskId !== null ||
                       deletingTaskId !== null ||
+                      uploadingTaskId !== null ||
                       refreshing
                     }
                   />
                   <Button
                     title="Delete"
                     onPress={() => confirmDeleteTask(item)}
-                    disabled={deletingTaskId !== null || refreshing}
+                    disabled={
+                      editingTaskId !== null ||
+                      deletingTaskId !== null ||
+                      uploadingTaskId !== null ||
+                      refreshing
+                    }
                   />
                 </>
               )}

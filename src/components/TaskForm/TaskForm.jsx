@@ -1,11 +1,18 @@
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
+const statusOptions = [
+  { value: 'NotStarted', label: 'Inte påbörjad' },
+  { value: 'InProgress', label: 'Pågående' },
+  { value: 'Completed', label: 'Klar' },
+];
+
 export default function TaskForm({ onSubmit }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [status, setStatus] = useState('NotStarted');
 
   async function handleSubmit() {
     if (saving) {
@@ -24,12 +31,13 @@ export default function TaskForm({ onSubmit }) {
       await onSubmit({
         title: title.trim(),
         description: description.trim(),
-        status: 'NotStarted',
+        status: status,
         dueDate: null,
       });
 
       setTitle('');
       setDescription('');
+      setStatus('NotStarted');
     } catch (err) {
       setError(err.message || 'Kunde inte skapa uppgiften.');
     } finally {
@@ -61,6 +69,17 @@ export default function TaskForm({ onSubmit }) {
         multiline
         placeholder="Lägg till en beskrivning"
       />
+      <Text>Status</Text>
+      {statusOptions.map((option) => (
+        <Button
+          key={option.value}
+          title={
+            status === option.value ? `${option.label} (vald)` : option.label
+          }
+          onPress={() => setStatus(option.value)}
+          disabled={saving}
+        />
+      ))}
 
       {error ? (
         <Text style={styles.error} accessibilityRole="alert">

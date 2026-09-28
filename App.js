@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { getTasks, createTask } from './src/services/taskService';
+import { getTasks, createTask, updateTask } from './src/services/taskService';
 import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
 import TaskForm from './src/components/TaskForm/TaskForm';
+import TaskEditForm from './src/components/TaskForm/TaskEditForm';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -10,6 +11,7 @@ export default function App() {
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -68,6 +70,18 @@ export default function App() {
     setTasks((currentTasks) => [createdTask, ...currentTasks]);
   }
 
+  async function handleUpdateTask(id, task) {
+    const updatedTask = await updateTask(id, task);
+
+    setTasks((currentTasks) =>
+      currentTasks.map((currentTask) =>
+        currentTask.id === id ? updatedTask : currentTask
+      )
+    );
+
+    setEditingTaskId(null);
+  }
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -83,18 +97,36 @@ export default function App() {
       ) : (
         <FlatList
           refreshing={refreshing}
-          onRefresh={handleRefresh}
+          onRefresh={editingTaskId === null ? handleRefresh : undefined}
           style={styles.list}
           contentContainerStyle={styles.listContent}
           data={tasks}
+          extraData={editingTaskId}
           ListHeaderComponent={<TaskForm onSubmit={handleCreateTask} />}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.taskItem}>
-              <Text style={styles.taskTitle}>{item.title}</Text>
-              <Text>Status: {item.status}</Text>
+              {editingTaskId === item.id ? (
+                <TaskEditForm
+                  task={item}
+                  onSubmit={handleUpdateTask}
+                  onCancel={() => setEditingTaskId(null)}
+                />
+              ) : (
+                <>
+                  <Text style={styles.taskTitle}>{item.title}</Text>
+                  <Text>{item.description}</Text>
+                  <Text>Status: {item.status}</Text>
+
+                  <Button
+                    title="Redigera"
+                    onPress={() => setEditingTaskId(item.id)}
+                    disabled={editingTaskId !== null || refreshing}
+                  />
+                </>
+              )}
             </View>
           )}
           ListEmptyComponent={<Text>Det finns inga uppgifter ännu.</Text>}

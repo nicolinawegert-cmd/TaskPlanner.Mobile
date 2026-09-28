@@ -37,3 +37,25 @@ export async function createTask(task) {
 
   return response.json();
 }
+
+export async function updateTask(id, task) {
+  if (!API_URL) {
+    throw new Error(
+      'API-adressen saknas. Ange EXPO_PUBLIC_API_URL i .env.local och ladda om appen.'
+    );
+  }
+
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(task),
+  });
+
+  if (!response.ok) {
+    throw new Error('Kunde inte uppdatera uppgiften.');
+  }
+
+  return response.json();
+}

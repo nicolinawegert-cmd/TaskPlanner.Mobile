@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Platform, Text, View } from 'react-native';
+import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function DueDatePicker({ value, onChange, disabled }) {
@@ -27,10 +27,21 @@ export default function DueDatePicker({ value, onChange, disabled }) {
   }
 
   return (
-    <View style={{ gap: 8 }}>
-      <Text>Due date</Text>
-
-      <Text>{value ? value.toLocaleDateString('en-GB') : 'No due date'}</Text>
+    <View style={styles.container}>
+      <View style={styles.summary}>
+        <Text style={[styles.date, !value && styles.emptyDate]}>
+          {value
+            ? value.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })
+            : 'No due date'}
+        </Text>
+        <Text style={styles.hint}>
+          {value ? 'Selected due date' : 'You can leave this empty.'}
+        </Text>
+      </View>
 
       <Button
         title={value ? 'Change date' : 'Select date'}
@@ -64,3 +75,18 @@ export default function DueDatePicker({ value, onChange, disabled }) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { gap: 8 },
+  summary: {
+    gap: 4,
+    padding: 14,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D0D5DD',
+    borderRadius: 8,
+  },
+  date: { fontSize: 20, fontWeight: '700', color: '#101828' },
+  emptyDate: { color: '#475467', fontWeight: '500' },
+  hint: { fontSize: 14, color: '#475467' },
+});

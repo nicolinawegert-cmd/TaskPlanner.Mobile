@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import SelectStatus from './SelectStatus';  
 import DueDatePicker from './DueDatePicker';
+import FormField from '../ui/FormField';
 import { formatDateForApi } from '../../utils/dateUtils';
 
 export default function TaskForm({ onSubmit }) {
@@ -69,9 +70,13 @@ export default function TaskForm({ onSubmit }) {
         placeholder="Add a description"
       />
 
-      <SelectStatus value={status} onChange={setStatus} disabled={saving} />
+      <FormField label="Status" hint="Choose the task's current status.">
+        <SelectStatus value={status} onChange={setStatus} disabled={saving} />
+      </FormField>
 
-      <DueDatePicker value={dueDate} onChange={setDueDate} disabled={saving} />
+      <FormField label="Due date" hint="Optional">
+        <DueDatePicker value={dueDate} onChange={setDueDate} disabled={saving} />
+      </FormField>
 
       {error ? (
         <Text style={styles.error} accessibilityRole="alert">

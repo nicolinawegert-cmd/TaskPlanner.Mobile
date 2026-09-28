@@ -6,6 +6,7 @@ import TaskForm from './src/components/TaskForm/TaskForm';
 import TaskEditForm from './src/components/TaskForm/TaskEditForm';
 import TaskAttachment from './src/components/TaskAttachment/TaskAttachment';
 import FileUpload from './src/components/FileUpload/FileUpload';
+import StatusBadge from './src/components/StatusBadge/StatusBadge';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -181,7 +182,9 @@ export default function App() {
                 <>
                   <Text style={styles.taskTitle}>{item.title}</Text>
                   <Text>{item.description}</Text>
-                  <Text>Status: {item.status}</Text>
+                  <View style={styles.statusContainer}>
+                    <StatusBadge status={item.status} />
+                  </View>
                   <Text>
                     Due date:{' '}
                     {item.dueDate ? item.dueDate.split('T')[0] : 'No due date'}
@@ -257,5 +260,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 6,
+  },
+  statusContainer: {
+    marginVertical: 8,
   },
 });

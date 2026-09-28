@@ -75,3 +75,16 @@ export async function deleteTask(id) {
     throw new Error('Could not delete the task.');
   }
 }
+
+export function getTaskFileUrl(fileName) {
+  if (!API_URL) {
+    throw new Error(
+      'API URL is missing. Set EXPO_PUBLIC_API_URL in .env.local and reload the app.'
+    );
+  }
+
+  return new URL(
+    `/uploads/${encodeURIComponent(fileName)}`,
+    API_URL
+  ).toString();
+}

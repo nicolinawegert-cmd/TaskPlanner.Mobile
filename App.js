@@ -4,6 +4,7 @@ import { getTasks, createTask, updateTask, deleteTask } from './src/services/tas
 import { Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
 import TaskForm from './src/components/TaskForm/TaskForm';
 import TaskEditForm from './src/components/TaskForm/TaskEditForm';
+import TaskAttachment from './src/components/TaskAttachment/TaskAttachment';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -167,6 +168,8 @@ export default function App() {
                     Due date:{' '}
                     {item.dueDate ? item.dueDate.split('T')[0] : 'No due date'}
                   </Text>
+
+                  <TaskAttachment fileName={item.fileName} />
 
                   <Button
                     title="Edit"

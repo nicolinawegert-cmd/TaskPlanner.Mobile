@@ -23,6 +23,7 @@ den tidigare bilagan. Sökning och statusfilter finns inte i mobilappen.
 
 Appen har testats manuellt på iPhone med Expo Go. Android och Expo Web har inte
 verifierats. Instruktionerna nedan gäller en fysisk telefon.
+Datumväljaren stöder inte Expo Web.
 
 ## 1. Starta backend
 
@@ -59,6 +60,8 @@ På Mac kan du använda följande kommando vid första installationen:
 ```sh
 cp .env.example .env.local
 ```
+
+Om du redan har en `.env.local`, redigera den i stället för att skriva över den.
 
 Ta reda på datorns lokala IP-adress. På Mac fungerar vanligtvis:
 
@@ -102,11 +105,18 @@ kan ändras när du byter nätverk.
 
 ## Hur koden är uppdelad
 
-- `App.js` håller uppgiftslistan och kopplar ihop komponenterna.
+- `App.js` håller uppgiftslistan, laddnings- och felstatus samt funktionerna som
+  anropar API:t och uppdaterar listan.
+- `src/components/TaskItem/TaskItem.jsx` visar ett uppgiftskort med status, datum,
+  bilaga och knappar. Den visar också redigeringsformuläret och får data och
+  funktioner via props från `App.js`.
 - `src/services/taskService.js` samlar API-anropen och adressen till bilagorna.
 - `src/components/TaskForm/` innehåller formulären och gemensamma status- och datumval.
 - `src/components/FileUpload/` hanterar filval och uppladdningsknappen.
 - `src/components/TaskAttachment/` visar och öppnar bilagor.
+- `src/components/StatusBadge/` väljer text och färg för uppgiftens status.
+- `src/components/ui/` innehåller de återanvändbara komponenterna `Badge`,
+  `FormField` och `AppButton`.
 - `src/utils/dateUtils.js` omvandlar datum mellan formulären och API:t.
 
 ## Tekniska val
@@ -114,9 +124,22 @@ kan ändras när du byter nätverk.
 React Native används för mobilens gränssnitt och Expo Go för att enkelt testa
 på en riktig telefon utan att publicera appen i en appbutik.
 
-Formulären använder `useState` för inmatningar och `useEffect` används för att
-hämta uppgifter vid start. Status- och datumval är egna komponenter som återanvänds
-vid både skapande och redigering.
+Formulären använder `useState` för inmatningar och `App.js` använder `useEffect`
+för att hämta uppgifter vid start. Uppgiftskortet har brutits ut till `TaskItem`
+för att skilja kortets utseende från hanteringen av listan och API-anropen.
+
+Status- och datumval är egna komponenter som återanvänds vid både skapande och
+redigering. `FormField` ger fälten samma rubriker, mellanrum och inramning.
+`Badge` visar korta etiketter och `StatusBadge` väljer rätt text och färg för statusen.
+
+`AppButton` används för uppgiftskortets åtgärder. Upload har en fylld blå knapp,
+Edit har en neutral ram och Delete är röd. Knapparna visar när de trycks ned
+och när de är inaktiverade. Bilagorna ligger i en egen del av kortet, medan
+Edit och Delete ligger längst ner. Status visas med både text och färg.
+
+Layouten använder flexibla bredder och låter knapparna på uppgiftskortet byta rad
+när utrymmet blir mindre. Mobilappen använder React Native-komponenter som
+`View`, `Text` och `Pressable` i stället för webbappens HTML och CSS.
 
 API-anropen ligger i en servicefil så att nätverkskoden hålls isär från
 gränssnittet. Uppgifter skickas som JSON. Filuppladdningen använder
@@ -139,6 +162,7 @@ HTTP används för lokal testning; vid publicering skulle API:t behöva HTTPS.
 - Ladda om appen efter ändrad API-adress. Om du ändrat den medan Expo kördes och
   den gamla adressen fortfarande används, starta om Expo.
 - När backend är igång igen, tryck **Try again** eller dra nedåt i listan.
+  Om ett formulär eller en filuppladdning misslyckades, försök spara eller ladda upp igen.
 
 Om Expo verkar använda gammal kod kan du stoppa Expo och köra:
 

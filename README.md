@@ -30,6 +30,10 @@ Datumväljaren stöder inte Expo Web.
 Följ [backendens README](https://github.com/nicolinawegert-cmd/TaskPlanner#readme)
 för att klona repot, installera paketen och skapa databasen.
 
+Om backend redan körs, stoppa den med `Ctrl+C` i dess terminal innan du kör
+kommandot nedan. Kör bara en backend-instans åt gången, annars kan port `5035`
+redan vara upptagen. Samma backend-instans kan användas av både webbappen och mobilappen.
+
 När du ska använda mobilappen, kör följande i backendens projektmapp
 i stället för vanlig `dotnet run`:
 
